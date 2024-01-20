@@ -1,8 +1,12 @@
 package com.bmce.IPL_Dashboard.model;
 
-import java.time.LocalDate;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
+import java.time.LocalDate;
+@Entity
 public class Match {
+    @Id
     private long id;
     private String city;
     private LocalDate date;
