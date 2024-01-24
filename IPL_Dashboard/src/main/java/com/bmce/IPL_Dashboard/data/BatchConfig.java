@@ -2,43 +2,41 @@ package com.bmce.IPL_Dashboard.data;
 
 import com.bmce.IPL_Dashboard.model.Match;
 
-
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-
 import org.springframework.batch.core.job.builder.JobBuilder;
-
-
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-
 import javax.sql.DataSource;
+
+
+
 
 public class BatchConfig {
 
 //public JobBuilderFactory jobBuilderFactory;
 
     //refering  field names from matchinput
-private final String[] FIELD_NAMES = new String[]{
+    private final String[] FIELD_NAMES = new String[] { "id", "city", "date", "player_of_match", "venue",
+            "neutral_venue", "team1", "team2", "toss_winner", "toss_decision", "winner", "result", "result_margin",
+            "eliminator", "method", "umpire1", "umpire2" };
 
-           "id","city","date","player_of_match","venue","neutral_venue","team1","team2","toss_winner","toss_decision","winner","result","result_margin","eliminator","method","umpire1","umpire2"
-    };
     @Bean
     public FlatFileItemReader<MatchInput> reader() {
-        return new FlatFileItemReaderBuilder<MatchInput>()
-                .name("MatchItemReader")
-                .resource(new ClassPathResource("match-data.csv"))
-                .delimited()
-                .names(FIELD_NAMES)
-                .targetType(MatchInput.class)
-                .build();
+    return new FlatFileItemReaderBuilder<MatchInput>()
+        .name("MatchItemReader")
+        .resource(new ClassPathResource("match-data.csv"))
+        .delimited()
+        .names(FIELD_NAMES)
+        .targetType(MatchInput.class)
+        .build();
     }
 
     @Bean
@@ -49,8 +47,8 @@ private final String[] FIELD_NAMES = new String[]{
     @Bean
     public JdbcBatchItemWriter<Match> writer(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<Match>()
-                .sql("INSERT INTO match (id,city,date,player_of_match,venue,team1,team2,toss_winner,toss_decision,match_winner,result,result_margin,umpire1,umpire2) "
-                        + "VALUES ( :id, :city, :date, :player_of_match, :venue, :team1, :team2, :toss_winner, :toss_decision, :match_winner, :result, :result_margin, :umpire1, :umpire2)")
+                .sql("INSERT INTO match (id, city, date, player_of_match, venue, team1, team2, toss_winner, toss_decision, match_winner, result, result_margin, umpire1, umpire2) "
+                        + " VALUES (:id, :city, :date, :playerOfMatch, :venue, :team1, :team2, :tossWinner, :tossDecision, :matchWinner, :result, :resultMargin, :umpire1, :umpire2)")
                 .dataSource(dataSource)
                 .beanMapped()
                 .build();
@@ -60,8 +58,8 @@ private final String[] FIELD_NAMES = new String[]{
     // next session
 
     @Bean
-    public BatchProperties.Job importUserJob(JobRepository jobRepository, Step step1, JobCompletionNotificationListener listener) {
-        return (BatchProperties.Job) new JobBuilder("importUserJob", jobRepository)
+    public Job importUserJob(JobRepository jobRepository, Step step1, JobCompletionNotificationListener listener) {
+        return  new JobBuilder("importUserJob", jobRepository)
                 .listener(listener)
                 .start(step1)
                 .build();
