@@ -18,10 +18,8 @@ import javax.sql.DataSource;
 
 
 
-
 public class BatchConfig {
 
-//public JobBuilderFactory jobBuilderFactory;
 
     //refering  field names from matchinput
     private final String[] FIELD_NAMES = new String[] { "id", "city", "date", "player_of_match", "venue",
@@ -30,29 +28,30 @@ public class BatchConfig {
 
     @Bean
     public FlatFileItemReader<MatchInput> reader() {
-    return new FlatFileItemReaderBuilder<MatchInput>()
-        .name("MatchItemReader")
-        .resource(new ClassPathResource("match-data.csv"))
-        .delimited()
-        .names(FIELD_NAMES)
-        .targetType(MatchInput.class)
-        .build();
+        return new FlatFileItemReaderBuilder<MatchInput>()
+                .name("MatchItemReader")
+                .resource(new ClassPathResource("match-data.csv"))
+                .delimited()
+                .names(FIELD_NAMES)
+                .targetType(MatchInput.class)
+                .build();
     }
 
     @Bean
     public MatchDataProcessor processor() {
+        System.out.println("get in to the processing ");
         return new MatchDataProcessor();
     }
 
     @Bean
     public JdbcBatchItemWriter<Match> writer(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<Match>()
-                .sql("INSERT INTO match (id, city, date, player_of_match, venue, team1, team2, toss_winner, toss_decision, match_winner, result, result_margin, umpire1, umpire2) "
-                        + " VALUES (:id, :city, :date, :playerOfMatch, :venue, :team1, :team2, :tossWinner, :tossDecision, :matchWinner, :result, :resultMargin, :umpire1, :umpire2)")
+                .sql("INSERT INTO match (id, city, date, player_of_match, venue, team1, team2, toss_winner, toss_decision, match_winner, result, result_margin, umpire1, umpire2) VALUES(:id, :city, :date, :playerOfMatch, :venue, :team1, :team2, :tossWinner, :tossDecision, :matchWinner, :result, :resultMargin, :umpire1, :umpire2)")
                 .dataSource(dataSource)
                 .beanMapped()
                 .build();
     }
+
 
 
     // next session
@@ -64,7 +63,11 @@ public class BatchConfig {
                 .start(step1)
                 .build();
     }
-
+    //    //add one
+//    @Bean
+//    public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+//        return new DataSourceTransactionManager(dataSource);
+//    }
     @Bean
     public Step step1(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
                       FlatFileItemReader<MatchInput> reader, MatchDataProcessor processor, JdbcBatchItemWriter<Match> writer) {
