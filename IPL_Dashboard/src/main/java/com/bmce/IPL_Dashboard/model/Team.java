@@ -1,12 +1,15 @@
 package com.bmce.IPL_Dashboard.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
 public class Team {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String teamName;
     private Long totalMatches;
@@ -15,6 +18,10 @@ public class Team {
     public Team(String teamName, Long totalMatches) {
         this.teamName = teamName;
         this.totalMatches = totalMatches;
+    }
+
+    public Team() {
+
     }
 
     public Long getId() {
@@ -47,5 +54,14 @@ public class Team {
 
     public void setTotalWins(Long totalWins) {
         this.totalWins = totalWins;
+    }
+
+    @Override
+    public String toString() {
+        return "Team{" +
+                "teamName='" + teamName + '\'' +
+                ", totalMatches=" + totalMatches +
+                ", totalWins=" + totalWins +
+                '}';
     }
 }
