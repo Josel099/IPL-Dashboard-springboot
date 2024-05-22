@@ -12,12 +12,12 @@ import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilde
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import javax.sql.DataSource;
 
-
-
+@Configuration
 public class BatchConfig {
 
 
@@ -27,13 +27,17 @@ public class BatchConfig {
             "eliminator", "method", "umpire1", "umpire2" };
 
     @Bean
+    public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+    @Bean
     public FlatFileItemReader<MatchInput> reader() {
         return new FlatFileItemReaderBuilder<MatchInput>()
                 .name("MatchItemReader")
                 .resource(new ClassPathResource("match-data.csv"))
                 .delimited()
                 .names(FIELD_NAMES)
-                .targetType(MatchInput.class)
+                .targetType(MatchInput .class)
                 .build();
     }
 
@@ -64,10 +68,7 @@ public class BatchConfig {
                 .build();
     }
     //    //add one
-//    @Bean
-//    public DataSourceTransactionManager transactionManager(DataSource dataSource) {
-//        return new DataSourceTransactionManager(dataSource);
-//    }
+
     @Bean
     public Step step1(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
                       FlatFileItemReader<MatchInput> reader, MatchDataProcessor processor, JdbcBatchItemWriter<Match> writer) {

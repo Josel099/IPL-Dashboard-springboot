@@ -17,10 +17,10 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
 
     private static final Logger log = LoggerFactory.getLogger(JobCompletionNotificationListener.class);
 
-    private final EntityManager em;
+    private final JdbcTemplate jdbcTemplate;
 
-    public JobCompletionNotificationListener(EntityManager em) {
-        this.em = em;
+    public JobCompletionNotificationListener(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -29,7 +29,8 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
             log.info("!!! JOB FINISHED! Time to verify the results");
 
 
-
+            jdbcTemplate.query("SELECT team1, team2 , date FROM match", new DataClassRowMapper<>(Match.class))
+                .forEach(match -> log.info("Found <{{}}> in the database.", match));
         }
     }
 
