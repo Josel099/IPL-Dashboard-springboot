@@ -8,8 +8,11 @@ public class Team {
 
     @Id
     private Long id;
+
     private String teamName;
+
     private Long totalMatches;
+
     private Long totalWins;
 
 }
