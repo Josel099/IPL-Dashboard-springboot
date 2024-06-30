@@ -38,40 +38,34 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
             log.info("!!! JOB FINISHED! Time to verify the results");
 
-            
-            // finding the total matched played by each team 
-           //@todo : handle an exception -> if an team always in the 2 nd position it will not be find. 
+            // finding the total matched played by each team
+            // @Todo : handle an exception -> if an team always in the 2 nd position it will not be
+            // find.
             em.createQuery("SELECT m.team1, count(*) FROM Match m GROUP BY m.team1", Object[].class)
-            .getResultList()
-            .stream()
-            .map(e -> new Team((String) e[0], (Long) e[1]))
-            .forEach(team -> teamData.put(team.getTeamName(), team));
+                .getResultList().stream().map(e -> new Team((String) e[0], (Long) e[1]))
+                .forEach(team -> teamData.put(team.getTeamName(), team));
 
             em.createQuery("SELECT m.team2, count(*) FROM Match m GROUP BY m.team2", Object[].class)
-            .getResultList()
-            .stream()
-            .forEach(e ->{
-                Team team = teamData.get((String)e[0]);
-                team.setTotalMatches(team.getTotalMatches()+(Long)e[1]);
-            });
-            
-            
-            // set the total wins of a team 
-            em.createQuery("SELECT m.matchWinner, count(*) FROM Match m GROUP BY m.matchWinner", Object[].class)
-            .getResultList()
-            .forEach(e -> {
+                .getResultList().stream().forEach(e -> {
+                    Team team = teamData.get((String) e[0]);
+                    team.setTotalMatches(team.getTotalMatches() + (Long) e[1]);
+                });
+
+            // set the total wins of a team
+            em.createQuery(
+                "SELECT m.matchWinner, count(*) FROM Match m GROUP BY m.matchWinner", Object[].class
+            ).getResultList().forEach(e -> {
                 Team team = teamData.get((String) e[0]);
                 if (team != null) {
                     team.setTotalWins((Long) e[1]);
                 }
             });
-            
+
             // persists it to the database using the EntityManager
             teamData.values().forEach(team -> em.persist(team));
+            teamData.values().forEach(team -> System.out.println(team));
         }
-        
-        
-        
+
     }
 
 }

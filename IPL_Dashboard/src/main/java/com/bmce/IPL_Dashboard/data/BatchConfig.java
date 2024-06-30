@@ -67,7 +67,6 @@ public class BatchConfig {
                 .start(step1)
                 .build();
     }
-    //    //add one
 
     @Bean
     public Step step1(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
